@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type Report = struct {
+type Report struct {
 	Levels []int
 }
 
@@ -39,14 +39,14 @@ func parse(lines []string) []Report {
 func solve(reports []Report) int {
 	valid := 0
 	for _, r := range reports {
-		if reportValid(r) {
+		if reportValidAsIs(r) || reportValidWithDeletion(r) {
 			valid += 1
 		}
 	}
 	return valid
 }
 
-func reportValid(report Report) bool {
+func reportValidAsIs(report Report) bool {
 	ls := report.Levels
 	increasing := ls[0] < ls[1]
 
@@ -60,6 +60,51 @@ func reportValid(report Report) bool {
 		}
 	}
 	return true
+}
+
+func reportValidWithDeletion(report Report) bool {
+	for i := 0; i < len(report.Levels); i++ {
+		if reportValidAsIs(report.without(i)) {
+			return true
+		}
+	}
+	return false
+}
+
+func reportValid(report Report, triesLeft int) bool {
+
+	if triesLeft <= 0 {
+		return false
+	}
+
+	withoutFirst := reportValid(report.without(0), triesLeft-1)
+	if withoutFirst == true {
+		return true
+	}
+
+	ls := report.Levels
+	increasing := ls[0] < ls[1]
+
+	for i := 1; i < len(ls); i++ {
+		if (ls[i-1] > ls[i]) == increasing {
+			return reportValid(report.without(i), triesLeft-1)
+		}
+		diff := abs(ls[i] - ls[i-1])
+		if diff < 1 || diff > 3 {
+			return reportValid(report.without(i), triesLeft-1)
+		}
+	}
+	return true
+}
+
+func (report Report) without(n int) Report {
+	return Report{Levels: without(report.Levels, n)}
+}
+
+func without(s []int, n int) []int {
+	a := make([]int, len(s))
+	copy(a, s)
+	return append(a[:n], a[n+1:]...)
 }
 
 func abs(a int) int {

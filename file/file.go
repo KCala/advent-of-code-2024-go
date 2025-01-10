@@ -6,9 +6,14 @@ import (
 	"strings"
 )
 
-func MustReadInput() []string {
+func MustReadInputAsLines() []string {
 	path := mustInputFile()
 	return MustReadFileLines(path)
+}
+
+func MustReadInput() string {
+	path := mustInputFile()
+	return MustReadFile(path)
 }
 
 func mustInputFile() string {
@@ -21,12 +26,17 @@ func mustInputFile() string {
 }
 
 func MustReadFileLines(path string) []string {
+	content := MustReadFile(path)
+	trimmed := strings.TrimRight(content, "\n\t")
+	lines := strings.Split(trimmed, "\n")
+	return lines
+}
+
+func MustReadFile(path string) string {
 	content, err := os.ReadFile(path)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	trimmed := strings.TrimRight(string(content), "\n\t")
-	lines := strings.Split(trimmed, "\n")
-	return lines
+	return string(content)
 }

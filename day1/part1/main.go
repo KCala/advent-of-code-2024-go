@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	lines := file.MustReadInput()
+	lines := file.MustReadInputAsLines()
 	left, right := parse(lines)
 	solution := solve(left, right)
 	fmt.Println(solution)
